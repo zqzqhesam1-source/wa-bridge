@@ -17,6 +17,27 @@ def db():
     return psycopg2.connect(DATABASE_URL)
 
 
+# ================= INIT DB =================
+def init_db():
+
+    conn = db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id SERIAL PRIMARY KEY,
+            phone TEXT,
+            message TEXT,
+            sender TEXT,
+            msg_time TEXT
+        )
+    """)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
 # ================= SEND TO NODE =================
 def send_to_whatsapp(image, caption):
 
@@ -70,9 +91,9 @@ def check_updates():
         if cur.fetchone():
             break
 
-        caption = f"📺 {title}"
+        msg = f"📺 {title}\n🔥 متاح الآن في الاستراحة!"
 
-        send_to_whatsapp(img_url, caption)
+        send_to_whatsapp(img_url, msg)
 
         cur.execute(
             "INSERT INTO messages(phone,message,sender,msg_time) VALUES('system',%s,'system',%s)",
@@ -119,4 +140,5 @@ def test():
 
 
 if __name__ == "__main__":
+    init_db()
     app.run(host="0.0.0.0", port=5000)
