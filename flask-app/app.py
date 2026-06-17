@@ -70,9 +70,9 @@ def check_updates():
         if cur.fetchone():
             break
 
-        msg = f"📺 {title}\n🔥 متاح الآن في الاستراحة!"
+        caption = f"📺 {title}"
 
-        send_to_whatsapp(img_url, msg)
+        send_to_whatsapp(img_url, caption)
 
         cur.execute(
             "INSERT INTO messages(phone,message,sender,msg_time) VALUES('system',%s,'system',%s)",
@@ -102,12 +102,11 @@ def force_check():
 def clear():
     conn = db()
     cur = conn.cursor()
-    # حذف الجدول بالكامل
-    cur.execute("DROP TABLE IF EXISTS messages")
+    cur.execute("DELETE FROM messages")
     conn.commit()
     cur.close()
     conn.close()
-    return "Table dropped and cleared"
+    return "cleared"
 
 
 @app.route("/api/send_test")
